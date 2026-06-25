@@ -1,0 +1,28 @@
+# Go
+bin/
+*.out
+vendor/
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+*.o
+*.a
+
+# Test
+coverage.out
+coverage.html
+*.test
+
+# Docker
+.docker/
