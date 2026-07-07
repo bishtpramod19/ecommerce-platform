@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: bishtps3/user-service:latest
+          image: bishtps3/user-service:1f04cec
           imagePullPolicy: Always
           ports:
             - containerPort: 8001
