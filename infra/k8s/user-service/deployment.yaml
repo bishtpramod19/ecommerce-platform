@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: default
+  labels:
+    app: user-service
+spec:
+  # Run 2 copies for high availability
+  # If one pod crashes, other still serves traffic
+  replicas: 2
+
+  # How to find pods managed by this deployment
+  selector:
+    matchLabels:
+      app: user-service
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1        # Allow 1 extra pod during update
+      maxUnavailable: 0  # Never have less than desired replicas during update
+
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+        - name: user-service
+          image: user-service:latest
+          imagePullPolicy: Never   # Use local image (for development)
+          ports:
+            - containerPort: 8001
+
+          # Load non-sensitive config from ConfigMap
+          envFrom:
+            - configMapRef:
+                name: user-service-config
+
+          # Load sensitive config from Secret
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-secret
+                  key: DB_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-secret
+                  key: JWT_SECRET
+
+          # Resource limits
+          # Requests: guaranteed resources
+          # Limits: maximum resources allowed
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+
+          # Liveness probe: is container alive?
+          # If fails: Kubernetes restarts the container
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 10  # Wait 10s before first check
+            periodSeconds: 10        # Check every 10s
+            failureThreshold: 3      # Restart after 3 failures
+
+          # Readiness probe: is container ready to receive traffic?
+          # If fails: Kubernetes removes pod from Service (stops sending traffic)
+          # Does NOT restart the container
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3

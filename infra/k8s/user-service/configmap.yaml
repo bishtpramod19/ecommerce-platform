@@ -1,0 +1,12 @@
+apiVersion: V1
+Kind: ConfigMap
+metadata:
+  name: user-service-config
+  namespace: user-service
+data:
+  SERVER_PORT: "8001"
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "users_db"
+  DB_USER: "postgres"
+  JWT_EXPIRY_HOURS: "24"
