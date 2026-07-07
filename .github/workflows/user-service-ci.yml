@@ -103,7 +103,7 @@ jobs:
 
   # ─── JOB 3: UPDATE MANIFEST ───────────────────────────────
   update-manifest:
-    name: Update K8s Manifest
+    name: Update helm values
     runs-on: ubuntu-latest
     needs: build-and-push  # Only runs if build-and-push passes
 
@@ -113,17 +113,17 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update image tag in deployment.yaml
+      - name: Update image tag in values-dev.yaml
         run: |
           NEW_TAG=${{ needs.build-and-push.outputs.image_tag }}
-          sed -i "s|image: bishtps3/user-service:.*|image: bishtps3/user-service:${NEW_TAG}|g" \
-            infra/k8s/user-service/deployment.yaml
+          sed -i "s|tag:.*|tag: ${NEW_TAG}|g" \
+            infra/helm/user-service/values-dev.yaml
           echo "Updated image tag to: ${NEW_TAG}"
 
       - name: Commit and push updated manifest
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add infra/k8s/user-service/deployment.yaml
+          git add infra/helm/user-service/values-dev.yaml
           git diff --staged --quiet || git commit -m "ci: update user-service image to ${{ needs.build-and-push.outputs.image_tag }}"
           git push

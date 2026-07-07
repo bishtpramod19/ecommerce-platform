@@ -1,0 +1,29 @@
+# Production environment overrides
+# Only specify values that DIFFER from values.yaml
+
+replicaCount: 3
+
+image:
+  tag: latest
+
+secret:
+  dbPassword: "CHANGE_ME_IN_PRODUCTION"
+  jwtSecret: "CHANGE_ME_IN_PRODUCTION"
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "200m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+probes:
+  liveness:
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    failureThreshold: 3
+  readiness:
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    failureThreshold: 3

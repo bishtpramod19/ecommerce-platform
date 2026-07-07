@@ -1,0 +1,6 @@
+apiVersion: v2
+name: user-service
+description: User Service for E-Commerce Platform
+type: application
+version: 0.1.0        # Chart version (changes when chart templates change)
+appVersion: "1.0.0"   # Application version (informational only)

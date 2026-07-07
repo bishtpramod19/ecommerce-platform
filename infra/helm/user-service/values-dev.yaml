@@ -1,0 +1,15 @@
+# Dev environment overrides
+# Only specify values that DIFFER from values.yaml
+
+replicaCount: 1
+
+image:
+  tag: latest
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"

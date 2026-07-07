@@ -1,0 +1,43 @@
+# Default values for user-service
+# These are overridden by values-dev.yaml, values-prod.yaml etc.
+
+replicaCount: 1
+
+image:
+  repository: bishtps3/user-service
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8001
+
+config:
+  serverPort: "8001"
+  dbHost: "postgres-service"
+  dbPort: "5432"
+  dbName: "users_db"
+  dbUser: "postgres"
+  jwtExpiryHours: "24"
+
+secret:
+  dbPassword: "postgres"
+  jwtSecret: "local-dev-secret-change-in-production"
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"
+
+probes:
+  liveness:
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    failureThreshold: 3
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    failureThreshold: 3
