@@ -28,8 +28,8 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: user-service:latest
-          imagePullPolicy: Never   # Use local image (for development)
+          image: bishtps3/user-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8001
 
