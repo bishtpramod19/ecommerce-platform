@@ -2,6 +2,7 @@
 # These are overridden by values-dev.yaml, values-prod.yaml etc.
 
 replicaCount: 1
+revisionHistoryLimit: 3
 
 image:
   repository: bishtps3/user-service
