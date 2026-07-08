@@ -18,6 +18,9 @@ resources:
     memory: "512Mi"
     cpu: "500m"
 
+postgres:
+  password: "CHANGE_ME_IN_PRODUCTION"
+
 probes:
   liveness:
     initialDelaySeconds: 15

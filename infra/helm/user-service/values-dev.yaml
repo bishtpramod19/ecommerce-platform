@@ -6,6 +6,9 @@ replicaCount: 1
 image:
   tag: 712d158
 
+postgres:
+  password: postgres
+  
 resources:
   requests:
     memory: "128Mi"

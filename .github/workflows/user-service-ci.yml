@@ -9,7 +9,8 @@ on:
     branches: [main]
     paths:
       - 'services/user-service/**'
-
+      
+  workflow_dispatch:
 env:
   SERVICE_NAME: user-service
   DOCKER_IMAGE: bishtps3/user-service

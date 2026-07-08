@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: user-service
+  namespace: argocd
+spec:
+  # Which cluster to deploy to
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+
+  # Which git repo to watch
+  source:
+    repoURL: https://github.com/bishtpramod19/ecommerce-platform.git
+    targetRevision: main
+    path: infra/helm/user-service
+
+    # Helm specific config
+    helm:
+      valueFiles:
+        - values-dev.yaml
+
+  # Which ArgoCD project
+  project: default
+
+  # Sync policy
+  syncPolicy:
+    automated:
+      prune: true      # Delete resources removed from git
+      selfHeal: true   # Auto-fix if someone manually changes cluster
+    syncOptions:
+      - CreateNamespace=true
