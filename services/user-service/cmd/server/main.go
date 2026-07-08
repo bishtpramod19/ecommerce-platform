@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"database/sql"
 
 	"github.com/bishtpramod19/ecommerce-platform/services/user-service/internal/adapters/repository/postgres"
 	"github.com/bishtpramod19/ecommerce-platform/services/user-service/internal/config"
@@ -27,9 +28,9 @@ func main() {
 	}
 
 	// Connect to database
-	db, err := postgres.NewPostgresDB(cfg)
+	db, err := connectWithRetry(cfg)
 	if err != nil {
-		fmt.Printf("error connecting to database: %v\n", err)
+		fmt.Printf("error connecting to database after retries: %v\n", err)
 		os.Exit(1)
 	}
 	defer db.Close()
@@ -101,4 +102,32 @@ func main() {
 	}
 
 	fmt.Println("server stopped")
-}// trigger ci
+}
+
+// connectWithRetry retries database connection with exponential backoff.
+// This handles cases where PostgreSQL starts after our service,
+// or temporarily goes down and comes back up.
+func connectWithRetry(cfg *config.Config) (*sql.DB, error) {
+    var db *sql.DB
+    var err error
+
+    maxRetries := 10
+    for i := 1; i <= maxRetries; i++ {
+        db, err = postgres.NewPostgresDB(cfg)
+        if err == nil {
+            return db, nil
+        }
+
+        if i == maxRetries {
+            break
+        }
+
+        // Exponential backoff: 2s, 4s, 8s, 16s... max 30s
+        waitTime := time.Duration(min(2<<i, 30)) * time.Second
+        fmt.Printf("DB connection attempt %d/%d failed: %v. Retrying in %v...\n",
+            i, maxRetries, err, waitTime)
+        time.Sleep(waitTime)
+    }
+
+    return nil, fmt.Errorf("failed to connect after %d attempts: %w", maxRetries, err)
+}
