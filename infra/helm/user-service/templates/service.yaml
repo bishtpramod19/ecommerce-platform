@@ -11,6 +11,12 @@ spec:
   selector:
     app: {{ .Release.Name }}
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.port }}
+    - name: grpc
+      protocol: TCP
+      port: {{ .Values.config.grpcPort }}
+      targetPort: {{ .Values.config.grpcPort }}
+    

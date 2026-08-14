@@ -2,21 +2,27 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-	"database/sql"
 
 	"github.com/bishtpramod19/ecommerce-platform/services/user-service/internal/adapters/repository/postgres"
 	"github.com/bishtpramod19/ecommerce-platform/services/user-service/internal/config"
+	grpcserver "github.com/bishtpramod19/ecommerce-platform/services/user-service/internal/grpc/server"
 	"github.com/bishtpramod19/ecommerce-platform/services/user-service/internal/handler"
 	"github.com/bishtpramod19/ecommerce-platform/services/user-service/internal/middleware"
+	"github.com/bishtpramod19/ecommerce-platform/services/user-service/internal/ports"
 	"github.com/bishtpramod19/ecommerce-platform/services/user-service/internal/service"
+	userpb "github.com/bishtpramod19/ecommerce-protos/user"
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -37,9 +43,16 @@ func main() {
 
 	// Wire up layers
 	// Repository (adapter) → Service → Handler
-	userRepo := postgres.NewUserRepository(db)
-	userSvc := service.NewUserService(userRepo, cfg.JWTSecret, cfg.JWTExpiryHours)
+	userStore := postgres.NewUserRepository(db)
+	userSvc := service.NewUserService(userStore, cfg.JWTSecret, cfg.JWTExpiryHours)
 	userHandler := handler.NewUserHandler(userSvc)
+
+	go func() {
+		if err := startGRPCServer(cfg, userStore); err != nil {
+			fmt.Printf("gRPC server error: %v\n", err)
+			os.Exit(1)
+		}
+	}()
 
 	// Setup router
 	r := chi.NewRouter()
@@ -108,26 +121,47 @@ func main() {
 // This handles cases where PostgreSQL starts after our service,
 // or temporarily goes down and comes back up.
 func connectWithRetry(cfg *config.Config) (*sql.DB, error) {
-    var db *sql.DB
-    var err error
+	var db *sql.DB
+	var err error
 
-    maxRetries := 10
-    for i := 1; i <= maxRetries; i++ {
-        db, err = postgres.NewPostgresDB(cfg)
-        if err == nil {
-            return db, nil
-        }
+	maxRetries := 10
+	for i := 1; i <= maxRetries; i++ {
+		db, err = postgres.NewPostgresDB(cfg)
+		if err == nil {
+			return db, nil
+		}
 
-        if i == maxRetries {
-            break
-        }
+		if i == maxRetries {
+			break
+		}
 
-        // Exponential backoff: 2s, 4s, 8s, 16s... max 30s
-        waitTime := time.Duration(min(2<<i, 30)) * time.Second
-        fmt.Printf("DB connection attempt %d/%d failed: %v. Retrying in %v...\n",
-            i, maxRetries, err, waitTime)
-        time.Sleep(waitTime)
-    }
+		// Exponential backoff: 2s, 4s, 8s, 16s... max 30s
+		waitTime := time.Duration(min(2<<i, 30)) * time.Second
+		fmt.Printf("DB connection attempt %d/%d failed: %v. Retrying in %v...\n",
+			i, maxRetries, err, waitTime)
+		time.Sleep(waitTime)
+	}
 
-    return nil, fmt.Errorf("failed to connect after %d attempts: %w", maxRetries, err)
+	return nil, fmt.Errorf("failed to connect after %d attempts: %w", maxRetries, err)
+}
+
+func startGRPCServer(cfg *config.Config, userStore ports.UserRepository) error {
+	// Open TCP listener on port 50051
+	lis, err := net.Listen("tcp", ":"+cfg.GRPCPort)
+	if err != nil {
+		return fmt.Errorf("failed to listen on port %s: %w", cfg.GRPCPort, err)
+	}
+
+	// Create new gRPC server
+	grpcSrv := grpc.NewServer()
+
+	// Register our UserGRPCServer implementation
+	// This tells gRPC: "when GetUser RPC comes in, call our server"
+	userGRPCServer := grpcserver.NewUserGRPCServer(userStore)
+	userpb.RegisterUserServiceServer(grpcSrv, userGRPCServer)
+
+	fmt.Println("user-service gRPC server starting on port " + cfg.GRPCPort)
+
+	// Start serving (blocking call)
+	return grpcSrv.Serve(lis)
 }

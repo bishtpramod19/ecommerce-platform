@@ -20,6 +20,7 @@ postgres:
 
 config:
   serverPort: "8001"
+  grpcPort: "50051"
   dbHost: "postgres-service"
   dbPort: "5432"
   dbName: "users_db"

@@ -15,6 +15,7 @@ type Config struct {
 	DBName         string `mapstructure:"DB_NAME"`
 	JWTSecret      string `mapstructure:"JWT_SECRET"`
 	JWTExpiryHours int    `mapstructure:"JWT_EXPIRY_HOURS"`
+	GRPCPort       string `mapstructure:"GRPC_PORT"`
 }
 
 func Load() (*Config, error) {
@@ -36,6 +37,7 @@ func Load() (*Config, error) {
 	viper.SetDefault("DB_NAME", "users_db")
 	viper.SetDefault("JWT_SECRET", "local-dev-secret-change-in-production")
 	viper.SetDefault("JWT_EXPIRY_HOURS", 24)
+	viper.SetDefault("GRPC_PORT", "50051")
 
 	cfg := &Config{}
 	if err := viper.Unmarshal(cfg); err != nil {
@@ -44,4 +46,3 @@ func Load() (*Config, error) {
 
 	return cfg, nil
 }
-

@@ -8,6 +8,7 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
 data:
   SERVER_PORT: {{ .Values.config.serverPort | quote }}
+  GRPC_PORT: {{ .Values.config.grpcPort | quote }}
   DB_HOST: {{ .Values.config.dbHost | quote }}
   DB_PORT: {{ .Values.config.dbPort | quote }}
   DB_NAME: {{ .Values.config.dbName | quote }}
