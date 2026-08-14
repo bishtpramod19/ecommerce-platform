@@ -1,6 +1,6 @@
 module github.com/bishtpramod19/ecommerce-platform/services/user-service
 
-go 1.26.4
+go 1.26.5
 
 require (
 	github.com/go-chi/chi/v5 v5.3.0
@@ -13,6 +13,7 @@ require (
 )
 
 require (
+	github.com/bishtpramod19/ecommerce-protos v0.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
