@@ -4,7 +4,7 @@
 replicaCount: 1
 
 image:
-  tag: 09aa8a9
+  tag: 14e138e
 
 postgres:
   password: postgres
