@@ -23,6 +23,7 @@ import (
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -159,6 +160,11 @@ func startGRPCServer(cfg *config.Config, userStore ports.UserRepository) error {
 	// This tells gRPC: "when GetUser RPC comes in, call our server"
 	userGRPCServer := grpcserver.NewUserGRPCServer(userStore)
 	userpb.RegisterUserServiceServer(grpcSrv, userGRPCServer)
+
+	// Register gRPC reflection (enables grpcurl to discover services)
+	// Useful for development and debugging
+	// Can be disabled in production for security
+	reflection.Register(grpcSrv)
 
 	fmt.Println("user-service gRPC server starting on port " + cfg.GRPCPort)
 
