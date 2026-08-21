@@ -13,11 +13,6 @@ service:
   type: ClusterIP
   port: 8001
 
-postgres:
-  user: postgres
-  password: postgres
-  db: users_db
-
 config:
   serverPort: "8001"
   grpcPort: "50051"

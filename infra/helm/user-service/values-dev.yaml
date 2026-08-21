@@ -1,13 +1,13 @@
 # Dev environment overrides
 # Only specify values that DIFFER from values.yaml
 
+namespace: ecommerce-dev
+
 replicaCount: 1
 
 image:
   tag: 14e138e
 
-postgres:
-  password: postgres
   
 resources:
   requests:

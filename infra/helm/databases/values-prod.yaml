@@ -1,0 +1,6 @@
+# Production overrides
+postgresql:
+  password: "CHANGE_ME_IN_PRODUCTION"
+
+mongodb:
+  password: "CHANGE_ME_IN_PRODUCTION"

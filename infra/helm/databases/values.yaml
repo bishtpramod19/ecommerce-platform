@@ -1,0 +1,20 @@
+# Default values for databases chart
+
+postgresql:
+  enabled: true
+  image: postgres:15-alpine
+  user: postgres
+  password: postgres
+  port: 5432
+
+mongodb:
+  enabled: true
+  image: mongo:7-jammy
+  user: mongo
+  password: mongo
+  port: 27017
+
+redis:
+  enabled: true
+  image: redis:7-alpine
+  port: 6379

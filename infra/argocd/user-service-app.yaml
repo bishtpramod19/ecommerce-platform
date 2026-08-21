@@ -4,9 +4,10 @@ metadata:
   name: user-service
   namespace: argocd
 spec:
+  project: ecommerce
   # Which cluster to deploy to
   destination:
-    namespace: default
+    namespace: ecommerce-dev
     server: https://kubernetes.default.svc
 
   # Which git repo to watch
@@ -20,8 +21,7 @@ spec:
       valueFiles:
         - values-dev.yaml
 
-  # Which ArgoCD project
-  project: default
+ 
 
   # Sync policy
   syncPolicy:

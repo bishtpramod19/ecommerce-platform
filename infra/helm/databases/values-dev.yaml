@@ -1,0 +1,6 @@
+# Dev overrides - same as defaults for now
+postgresql:
+  password: postgres
+
+mongodb:
+  password: mongo

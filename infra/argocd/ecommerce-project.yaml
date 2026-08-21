@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: ecommerce
+  namespace: argocd
+spec:
+  description: E-Commerce Platform - All Microservices
+
+  # Only allow deployments from our repo
+  sourceRepos:
+    - https://github.com/bishtpramod19/ecommerce-platform.git
+
+  # Only allow deployments to these destinations
+  destinations:
+    - namespace: ecommerce-dev
+      server: https://kubernetes.default.svc
+    - namespace: ecommerce-prod
+      server: https://kubernetes.default.svc
+
+  # Allow these Kubernetes resources
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+
+  namespaceResourceWhitelist:
+    - group: 'apps'
+      kind: Deployment
+    - group: ''
+      kind: Service
+    - group: ''
+      kind: ConfigMap
+    - group: ''
+      kind: Secret
+    - group: ''
+      kind: PersistentVolumeClaim
