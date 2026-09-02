@@ -1,0 +1,43 @@
+replicaCount: 1
+
+image:
+  repository: bishtps3/product-service
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8002
+  grpcPort: 50052
+
+config:
+  serverPort: "8002"
+  grpcPort: "50052"
+  mongoURI: "mongodb://mongo:mongo@mongodb-service:27017"
+  mongoDB: "products_db"
+  redisAddr: "redis-service:6379"
+  redisPassword: ""
+  jwtSecret: "local-dev-secret-change-in-production"
+  userServiceAddr: "user-service:50051"
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"
+
+revisionHistoryLimit: 3
+
+probes:
+  liveness:
+    path: /health
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    failureThreshold: 3
+  readiness:
+    path: /health
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    failureThreshold: 3

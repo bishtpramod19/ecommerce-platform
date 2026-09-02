@@ -1,0 +1,7 @@
+replicaCount: 1
+
+image:
+  tag: latest
+
+config:
+  jwtSecret: "local-dev-secret-change-in-production"

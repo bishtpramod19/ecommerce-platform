@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+data:
+  SERVER_PORT: {{ .Values.config.serverPort | quote }}
+  GRPC_PORT: {{ .Values.config.grpcPort | quote }}
+  MONGO_URI: {{ .Values.config.mongoURI | quote }}
+  MONGO_DB: {{ .Values.config.mongoDB | quote }}
+  REDIS_ADDR: {{ .Values.config.redisAddr | quote }}
+  REDIS_PASSWORD: {{ .Values.config.redisPassword | quote }}
+  JWT_SECRET: {{ .Values.config.jwtSecret | quote }}
+  USER_SERVICE_ADDR: {{ .Values.config.userServiceAddr | quote }}
