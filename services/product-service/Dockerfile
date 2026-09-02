@@ -5,11 +5,11 @@ RUN apk add --no-cache git
 WORKDIR /app
 
 # Copy dependency files first (layer caching optimization)
-COPY go.mod go.sum ./
+COPY services/product-service/go.mod services/product-service/go.sum ./
 RUN go mod download
 
 # COPY source code
-COPY . .
+COPY services/product-service/ .
 
 # Build Binary
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o product-service ./cmd/server/main.go
