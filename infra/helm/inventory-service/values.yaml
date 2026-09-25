@@ -1,0 +1,45 @@
+replicaCount: 1
+
+image:
+  repository: bishtps3/inventory-service
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  grpcPort: 50053
+
+config:
+  grpcPort: "50053"
+  dbHost: "postgres-service"
+  dbPort: "5432"
+  dbUser: "postgres"
+  dbName: "inventory_db"
+  redisAddr: "redis-service:6379"
+  redisPassword: ""
+  lockTTLSeconds: "30"
+
+secret:
+  dbPassword: " "
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"
+
+revisionHistoryLimit: 3
+
+probes:
+  liveness:
+    port: 50053
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    failureThreshold: 3
+  readiness:
+    port: 50053
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    failureThreshold: 3

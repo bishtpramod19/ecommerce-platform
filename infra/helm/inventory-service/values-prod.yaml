@@ -1,0 +1,15 @@
+replicaCount: 3
+
+image:
+  tag: latest
+
+secret:
+  dbPassword: "CHANGE_ME_IN_PRODUCTION"
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "200m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
