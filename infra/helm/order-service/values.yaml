@@ -1,0 +1,46 @@
+replicaCount: 1
+
+image:
+  repository: bishtps3/order-service
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8004
+
+config:
+  serverPort: "8004"
+  dbHost: "postgres-service"
+  dbPort: "5432"
+  dbUser: "postgres"
+  dbName: "orders_db"
+  jwtSecret: "local-dev-secret-change-in-production"
+  userServiceAddr: "user-service:50051"
+  productServiceAddr: "product-service:50052"
+  inventoryServiceAddr: "inventory-service:50053"
+
+secret:
+  dbPassword: "postgres"
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"
+
+revisionHistoryLimit: 3
+
+probes:
+  liveness:
+    path: /health
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    failureThreshold: 3
+  readiness:
+    path: /health
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    failureThreshold: 3
