@@ -1,0 +1,18 @@
+{{- if .Values.grafana.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasource
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: grafana
+data:
+  datasource.yml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus:{{ .Values.prometheus.port }}
+        isDefault: true
+{{- end }}
