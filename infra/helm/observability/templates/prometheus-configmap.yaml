@@ -1,0 +1,20 @@
+{{- if .Values.prometheus.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: prometheus
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: {{ .Values.prometheus.scrapeInterval }}
+    scrape_configs:
+    {{- range .Values.prometheus.targets }}
+      - job_name: {{ .name | quote }}
+        metrics_path: /metrics
+        static_configs:
+          - targets: [{{ .address | quote }}]
+    {{- end }}
+{{- end }}

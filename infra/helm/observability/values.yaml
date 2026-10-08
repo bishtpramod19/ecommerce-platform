@@ -1,0 +1,14 @@
+prometheus:
+  enabled: true
+  image: prom/prometheus:v3.0.0
+  port: 9090
+  scrapeInterval: 15s
+  targets:
+    - name: user-service
+      address: user-service:8001
+    - name: product-service
+      address: product-service:8002
+    - name: order-service
+      address: order-service:8004
+    - name: inventory-service
+      address: inventory-service:9090
