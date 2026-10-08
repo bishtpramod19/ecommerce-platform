@@ -17,6 +17,7 @@ import (
 	"github.com/bishtpramod19/ecommerce-platform/services/order-service/internal/service"
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 )
 
@@ -76,12 +77,15 @@ func main() {
 	r.Use(chiMiddleware.RealIP)
 	r.Use(chiMiddleware.Recoverer)
 	r.Use(chiMiddleware.Timeout(30 * time.Second))
+	r.Use(middleware.MetricsMiddleware("order-service"))
 
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"status": "ok", "service": "order-service"}`))
 	})
+
+	r.Handle("/metrics", promhttp.Handler())
 
 	r.Route("/v1/orders", func(r chi.Router) {
 		r.Use(middleware.AuthMiddleware(cfg.JWTSecret))

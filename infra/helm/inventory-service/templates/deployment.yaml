@@ -54,6 +54,8 @@ spec:
           ports:
             - containerPort: {{ .Values.service.grpcPort }}
               name: grpc
+            - containerPort: 9090
+              name: metrics
           envFrom:
             - configMapRef:
                 name: {{ .Release.Name }}-config

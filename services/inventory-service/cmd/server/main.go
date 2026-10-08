@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,6 +14,7 @@ import (
 	grpcserver "github.com/bishtpramod19/ecommerce-platform/services/inventory-service/internal/grpc/server"
 	"github.com/bishtpramod19/ecommerce-platform/services/inventory-service/internal/service"
 	inventorypb "github.com/bishtpramod19/ecommerce-protos/inventory"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
@@ -63,12 +65,25 @@ func main() {
 		logger.Fatal().Err(err).Msgf("failed to listen on port %s", cfg.GRPCPort)
 	}
 
-	grpcSrv := grpc.NewServer()
+	grpcSrv := grpc.NewServer(grpc.UnaryInterceptor(grpcserver.MetricsUnaryInterceptor("inventory-service")))
 
 	inventoryGRPCServer := grpcserver.NewInventoryGRPCServer(inventorySvc)
 	inventorypb.RegisterInventoryServiceServer(grpcSrv, inventoryGRPCServer)
 
 	reflection.Register(grpcSrv)
+
+	// Metrics HTTP Server
+
+	metricsMux := http.NewServeMux()
+	metricsMux.Handle("/metrics", promhttp.Handler())
+	metricsSrv := &http.Server{Addr: ":9090", Handler: metricsMux}
+
+	go func() {
+		logger.Info().Str("port", "9090").Msg("metrics server starting")
+		if err := metricsSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Error().Err(err).Msg("metrics server error")
+		}
+	}()
 
 	// ─── Start Server ─────────────────────────────────────
 	quit := make(chan os.Signal, 1)
@@ -85,5 +100,6 @@ func main() {
 	<-quit
 	logger.Info().Msg("shutting down inventory-service...")
 	grpcSrv.GracefulStop()
+	metricsSrv.Close()
 	logger.Info().Msg("inventory-service stopped")
 }

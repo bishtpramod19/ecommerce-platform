@@ -21,6 +21,7 @@ import (
 	productpb "github.com/bishtpramod19/ecommerce-protos/product"
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
@@ -93,6 +94,7 @@ func main() {
 	r.Use(chiMiddleware.RealIP)
 	r.Use(chiMiddleware.Recoverer)
 	r.Use(chiMiddleware.Timeout(30 * time.Second))
+	r.Use(middleware.MetricsMiddleware("product-service"))
 	r.Use(middleware.LoggingMiddleware(logger))
 	r.Use(middleware.RateLimitMiddleware(rateLimiter))
 
@@ -102,6 +104,8 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"status": "ok", "service": "product-service"}`))
 	})
+
+	r.Handle("/metrics", promhttp.Handler())
 
 	// Public routes (no auth required)
 	r.Route("/v1/products", func(r chi.Router) {
