@@ -6,7 +6,7 @@ namespace: ecommerce-dev
 replicaCount: 1
 
 image:
-  tag: 8da9d66
+  tag: 23b9a0c
 
   
 resources:
