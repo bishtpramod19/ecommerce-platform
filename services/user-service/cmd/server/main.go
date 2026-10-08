@@ -21,6 +21,7 @@ import (
 	userpb "github.com/bishtpramod19/ecommerce-protos/user"
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -63,6 +64,7 @@ func main() {
 	r.Use(chiMiddleware.RealIP)
 	r.Use(chiMiddleware.Logger)
 	r.Use(chiMiddleware.Recoverer)
+	r.Use(middleware.MetricsMiddleware("user-service"))
 	r.Use(chiMiddleware.Timeout(30 * time.Second))
 
 	// Health check (no auth required)
@@ -71,6 +73,8 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"status": "ok"}`))
 	})
+
+	r.Handle("/metrics", promhttp.Handler())
 
 	// Public routes (no auth required)
 	r.Route("/v1/auth", func(r chi.Router) {
