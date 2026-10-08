@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  tag: 47565be
+  tag: f577c63
 
 secret:
   dbPassword: "postgres"
