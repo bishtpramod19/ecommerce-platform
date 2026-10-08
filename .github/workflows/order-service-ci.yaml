@@ -130,5 +130,15 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add infra/helm/order-service/values-dev.yaml
-          git diff --staged --quiet || git commit -m "ci: update order-service image tag to ${{ needs.build-and-push.outputs.image_tag }}"
-          git push
+          git diff --staged --quiet && exit 0
+          git commit -m "ci: update order-service image tag to ${{ needs.build-and-push.outputs.image_tag }}"
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin main; then
+              exit 0
+            fi
+            echo "Push failed (attempt $i), retrying..."
+            sleep $((RANDOM % 5 + 2))
+          done
+          echo "Failed to push after 5 attempts"
+          exit 1
+          
