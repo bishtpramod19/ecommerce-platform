@@ -23,7 +23,7 @@ spec:
       kind: Namespace
     - group: ''
       kind: PersistentVolume
-    - group: ''
+    - group: storage.k8s.io
       kind: StorageClass
 
   namespaceResourceWhitelist:
