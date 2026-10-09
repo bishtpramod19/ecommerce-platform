@@ -1,0 +1,13 @@
+storageClass:
+  name: local-storage
+  reclaimPolicy: Retain
+
+volumes:
+  - name: postgres-pv
+    size: 1Gi
+    path: /data/postgres
+    claim: data-postgres-0
+  - name: mongodb-pv
+    size: 1Gi
+    path: /data/mongodb
+    claim: data-mongodb-0

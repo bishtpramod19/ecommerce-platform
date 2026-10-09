@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: storage
+  namespace: argocd
+spec:
+  project: ecommerce
+
+  destination:
+    namespace: ecommerce-dev
+    server: https://kubernetes.default.svc
+
+  source:
+    repoURL: https://github.com/bishtpramod19/ecommerce-platform.git
+    targetRevision: main
+    path: infra/helm/storage
+
+  syncPolicy:
+    automated:
+      prune: false      # never auto-delete storage objects
+      selfHeal: true

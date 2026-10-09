@@ -1,0 +1,22 @@
+{{- range .Values.volumes }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .name }}
+  labels:
+    app: {{ .name }}
+spec:
+  capacity:
+    storage: {{ .size }}
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: {{ $.Values.storageClass.reclaimPolicy }}
+  storageClassName: {{ $.Values.storageClass.name }}
+  claimRef:
+    namespace: {{ $.Release.Namespace }}
+    name: {{ .claim }}
+  hostPath:
+    path: {{ .path }}
+    type: DirectoryOrCreate
+{{- end }}

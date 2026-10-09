@@ -21,6 +21,10 @@ spec:
   clusterResourceWhitelist:
     - group: ''
       kind: Namespace
+    - group: ''
+      kind: PersistentVolume
+    - group: ''
+      kind: StorageClass
 
   namespaceResourceWhitelist:
     - group: 'apps'
@@ -33,3 +37,5 @@ spec:
       kind: Secret
     - group: ''
       kind: PersistentVolumeClaim
+    - group: 'apps'
+      kind: StatefulSet
