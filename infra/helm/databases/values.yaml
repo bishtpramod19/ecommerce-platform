@@ -6,6 +6,9 @@ postgresql:
   user: postgres
   password: postgres
   port: 5432
+  storage:
+    size: 1Gi
+    storageClass: local-storage
 
 mongodb:
   enabled: true
