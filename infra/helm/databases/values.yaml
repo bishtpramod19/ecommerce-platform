@@ -16,6 +16,9 @@ mongodb:
   user: mongo
   password: mongo
   port: 27017
+  storage:
+    size: 1Gi
+    storageClass: local-storage
 
 redis:
   enabled: true

@@ -1,6 +1,6 @@
 {{- if .Values.mongodb.enabled }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: mongodb
   namespace: {{ .Release.Namespace }}
@@ -8,6 +8,7 @@ metadata:
     app: mongodb
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
 spec:
+  serviceName: mongodb-headless
   replicas: 1
   selector:
     matchLabels:
@@ -28,6 +29,9 @@ spec:
               value: {{ .Values.mongodb.password | quote }}
           ports:
             - containerPort: {{ .Values.mongodb.port }}
+          volumeMounts:
+            - name: data
+              mountPath: /data/db
           readinessProbe:
             exec:
               command:
@@ -36,6 +40,32 @@ spec:
                 - "db.adminCommand('ping')"
             initialDelaySeconds: 10
             periodSeconds: 5
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        {{- if .Values.mongodb.storage.storageClass }}
+        storageClassName: {{ .Values.mongodb.storage.storageClass | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.mongodb.storage.size }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-headless
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: mongodb
+spec:
+  clusterIP: None
+  selector:
+    app: mongodb
+  ports:
+    - port: {{ .Values.mongodb.port }}
+      targetPort: {{ .Values.mongodb.port }}
 ---
 apiVersion: v1
 kind: Service
