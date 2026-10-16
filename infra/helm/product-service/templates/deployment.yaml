@@ -22,6 +22,8 @@ spec:
       labels:
         app: {{ .Release.Name }}
     spec:
+      serviceAccountName: {{ .Release.Name }}
+      automountServiceAccountToken: false
       initContainers:
         - name: wait-for-mongodb
           image: busybox:1.35
